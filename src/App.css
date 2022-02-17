@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+
+h1 {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.face {
+  position:absolute;
+  width: 100px;
+  height: 100px;
+  background: hotpink;
+  border-radius: 50%;
+  cursor: -webkit-grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre;
+  will-change: transform;
+}
+
+#mdiv{	position: relative; }
