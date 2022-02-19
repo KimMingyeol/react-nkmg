@@ -1,50 +1,61 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { useDrag } from "@use-gesture/react";
+import { rubberbandIfOutOfBounds, useDrag } from "@use-gesture/react";
 import { useSpring, animated } from "react-spring";
 import react from "react";
 
-const speed = 500;
-const range = 100;
-const offset = 30;
+const speed = 300;
+const range = 30;
+const offsetY = 20;
 
 function Drag_Child({ sx, sy }) {
     const ref = useRef();
     const lasty = useRef(0);
-    const [props0, api0] = useSpring(() => ({ x: 0, y: 0 }));
+    const [props0, api0] = useSpring(() => ({ x: 0, y: offsetY }));
+    const sstate = useRef(true);
+    const initime = useRef(0);
 
     const [toCheck, SettoCheck] = useState(false);
-
-    var SineReq;
+    
     const [style, api] = useSpring(() => ({ x: 0, y: 0,
     onStart() {
-        cancelAnimationFrame(SineReq);
+        // cancelAnimationFrame(SineReq);
+        sstate.current = false;
+
         console.log(lasty.current);
-        api0.start({x: 0, y: 0, from: {x: 0, y: lasty.current}, config:{tension:100}});
+        api0.start({x: 0, y: offsetY, from: {x: 0, y: lasty.current}, config:{ tension:60 }});
         console.log('Started');
     }, onRest() {
-        console.log('Stopped')
+        sstate.current = true;
+        
+        initime.current = Date.now();
+        requestAnimationFrame(animate);
+        console.log('Stopped');
     } }));
     console.log("rerender1");
 
-    useEffect(() => {
-        function animate() {
-          // const x = Math.cos(Date.now() / speed) * range;s
-          const x = 0;
-          const y = Math.sin(Date.now() / speed) * range;
-          // const z = Math.sin(Date.now() / speed) * range + offset;
-          api0.start({x, y, config:{tension:0}});
-          // ref.current.style = `position: absolute; transform: translate3d(${x}px,${y}px,0)`;
-          lasty.current = y;
-          
-          SineReq = requestAnimationFrame(animate);
-        }
-        animate();
-      }, [ref]);
+
+    function animate() {
+        // const x = Math.cos(Date.now() / speed) * range;
+        // console.log(sstate.current);
+        if(!sstate.current) return;
+
+        const x = 0;
+        const y = Math.cos((Date.now() - initime.current) / speed) * range - range + offsetY;
+        // const z = Math.sin(Date.now() / speed) * range + offset;
+        api0.start({x, y, config:{tension:0}});
+        // ref.current.style = `position: absolute; transform: translate3d(${x}px,${y}px,0)`;
+        lasty.current = y;
+        
+        requestAnimationFrame(animate);
+      }
 
     useEffect(() => {
         api.start({config: {friction:26, tension:360}});
         console.log(props0)
+
+        initime.current = Date.now();
+        requestAnimationFrame(animate);
     }, [])
 
     useEffect(() => {
